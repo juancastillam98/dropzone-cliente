@@ -1,95 +1,61 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client"
+import {useContext, useEffect} from "react";
+import Link from "next/link";
+import {AuthContext} from "../context/auth/authContext";
+import {AppContext} from "@/context/app/appContext";
+import {Dropzone} from "../components/Dropzone";
+import {Alerta} from "@/components/Alerta";
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
+export default function Page() {
+    //Extraer el usuario autenticado del localStorage.
+    const {usuarioAutenticado} = useContext(AuthContext);
+    const {mensaje_archivo, url}=useContext(AppContext)
+    //Solo quiero comprobar 1 vez el usuario autenticado
+    useEffect(()=>{
+        const token = localStorage.getItem("token")
+        if(token){
+            usuarioAutenticado()
+        }
+    }, [])
 
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    return (
+        <div className="md:w-4/5 xl:w-3/5 mx-auto mb-32">
+            {url ?
+                <>
+                    <p className={"text-center text-2xl mt-10"}>
+                        Tu Url es <span className={"font-bold text-blue-700 text-2xl break-words mt-2"}>{`${process.env.NEXT_PUBLIC_frontendURL}/enlaces/${url}`}</span>
+                    </p>
+                    <button
+                        type={"submit"}
+                        className={"bg-red-500 hover:bg-gray-900 hover:cursor-pointer w-full p-2 text-white font-bold uppercase mt-10"}
+                        //esto del clipboar es para que al hacer click, se te copie todo lo que hay en writeText
+                        onClick={()=>navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_frontendURL}/enlaces/${url}`)}
+                    >
+                        Copiar enlace
+                    </button>
+                </>
+
+                :
+                (
+                    <>
+                        {mensaje_archivo && <Alerta/>}
+                        <div className="lg:flex md:shadow-lg p-5 bg-white rounded-lg py-10">
+                            <div className="md:flex-1 mb-3 mx-2 mt-16 lg:mt-0">
+                                <Dropzone/>
+                            </div>
+                            <div className="md:flex-1 mb-3 mx-2 mt-16 lg:mt-0">
+                                <h2 className={"text-4xl font-sans font-bold text-gray-800 my-4"}>Compartir archivos de forma sencilla y privada</h2>
+                                <p className={"text-lg leading-loose"}>
+                                <span className={"text-red-500 font-bold"}>
+                                    React NodeSend &nbsp;
+                                </span>
+                                    te permite compartir archivos con cifrado extremo a extremo
+                                </p>
+                                <Link href={"/crearcuenta"}><p className={"text-red-500 font-bold text-lg hover:text-red-700"}>Crea una cuenta para mayores beneficios</p></Link>
+                            </div>
+                        </div>
+                    </>
+                )}
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    )
 }
